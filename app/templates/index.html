@@ -1,0 +1,72 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Health Monitor</title>
+    <link
+    rel="stylesheet"
+    href="{{ url_for('static', filename='style.css') }}"
+>
+</head>
+<body>
+    <header>
+        <h1>API Health Monitor</h1>
+        <p>Monitor your API endpoints in one place.</p>
+    </header>
+
+    <main>
+        <section>
+            <h2>Check an API</h2>
+
+            <form action="{{ url_for('main.check') }}" method="POST">
+                <label for="url">API URL</label>
+                <input
+                    type="url"
+                    id="url"
+                    name="url"
+                    placeholder="https://jsonplaceholder.typicode.com/posts/1"
+                    value="{{ submitted_url or '' }}"
+                    required
+                >
+                <button type="submit">Check API</button>
+            </form>
+        </section>
+
+        {% if result %}
+        <section>
+            <h2>Check Result</h2>
+
+            <p>
+                Reachability:
+                <strong>
+                    {{ "Reachable" if result.reachable else "Unreachable" }}
+                </strong>
+            </p>
+
+            <p>
+                Health:
+                <strong>
+                    {{ "Healthy" if result.healthy else "Unhealthy" }}
+                </strong>
+            </p>
+
+            <p>
+                HTTP Status:
+                {{ result.status_code if result.status_code is not none else "No response" }}
+            </p>
+
+            <p>
+                Response Time:
+                {{ result.response_time_ms }} ms
+            </p>
+
+            {% if result.error %}
+                <p>Error: {{ result.error }}</p>
+            {% endif %}
+        </section>
+        {% endif %}
+    </main>
+</body>
+</html>

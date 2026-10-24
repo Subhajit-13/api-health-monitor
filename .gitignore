@@ -1,0 +1,16 @@
+# Python virtual environment
+.venv/
+
+# Python cache files
+__pycache__/
+*.py[cod]
+
+# Local database
+api_health.db
+*.sqlite3
+
+# Test and tooling caches
+.pytest_cache/
+
+# macOS
+.DS_Store
