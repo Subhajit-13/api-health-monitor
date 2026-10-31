@@ -1,15 +1,13 @@
-
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>API Health Monitor</title>
-    <link
-    rel="stylesheet"
-    href="{{ url_for('static', filename='style.css') }}"
->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
+
 <body>
     <header>
         <h1>API Health Monitor</h1>
@@ -22,15 +20,9 @@
 
             <form action="{{ url_for('main.check') }}" method="POST">
                 <label for="url">API URL</label>
-                <input
-                    type="url"
-                    id="url"
-                    name="url"
-                    placeholder="https://jsonplaceholder.typicode.com/posts/1"
-                    value="{{ submitted_url or '' }}"
-                    required
-                >
-                <button type="submit">Check API</button>
+                <input type="url" id="url" name="url" placeholder="https://jsonplaceholder.typicode.com/posts/1"
+                    value="{{ submitted_url or '' }}" required>
+                <button type="submit" id="check-button">Check API</button>
             </form>
         </section>
 
@@ -63,10 +55,73 @@
             </p>
 
             {% if result.error %}
-                <p>Error: {{ result.error }}</p>
+            <p>Error: {{ result.error }}</p>
             {% endif %}
         </section>
         {% endif %}
+
+        <section>
+            <h2>Check History</h2>
+
+            {% if history %}
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>API URL</th>
+                            <th>Reachability</th>
+                            <th>Health</th>
+                            <th>Status Code</th>
+                            <th>Response Time</th>
+                            <th>Checked At</th>
+                            <th>Error</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for record in history %}
+                        <tr>
+                            <td>{{ record.url }}</td>
+                            <td>
+                                <span class="status-badge {{ 'success' if record.reachable else 'danger' }}">
+                                    {{ "Reachable" if record.reachable else "Unreachable" }}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="status-badge {{ 'success' if record.healthy else 'danger' }}">
+                                    {{ "Healthy" if record.healthy else "Unhealthy" }}
+                                </span>
+                            </td>
+                            <td>
+                                {{ record.status_code if record.status_code is not none else "No response" }}
+                            </td>
+                            <td>{{ "%.2f"|format(record.response_time_ms) }} ms</td>
+                            <td>{{ record.checked_at }}</td>
+                            <td>
+                                {{ record.error if record.error else "—" }}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <p>No API checks recorded yet.</p>
+                <span>Your API check history will appear here once you start monitoring endpoints.</span>
+            </div>
+            {% endif %}
+        </section>
     </main>
+    <script>
+    const checkForm = document.querySelector("form");
+    const checkButton = document.getElementById("check-button");
+
+    checkForm.addEventListener("submit", () => {
+        checkButton.disabled = true;
+        checkButton.textContent = "Checking...";
+    });
+</script>
 </body>
+
 </html>

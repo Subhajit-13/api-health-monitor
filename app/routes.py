@@ -1,13 +1,14 @@
 from flask import Blueprint, render_template, request
-
 from app.monitor import check_api, validate_url
+from app.database import get_api_check_history, save_api_check
 
 main_bp = Blueprint("main", __name__)
 
 
 @main_bp.route("/")
 def index():
-    return render_template("index.html")
+    history = get_api_check_history()
+    return render_template("index.html", history=history)
 
 
 
@@ -28,6 +29,7 @@ def check():
         }
     else:
         result = check_api(url)
+        save_api_check(result)
 
     return render_template(
         "index.html",
